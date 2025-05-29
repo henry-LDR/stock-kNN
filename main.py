@@ -1,3 +1,4 @@
+#Import modules
 import yfinance as yf
 import bs4
 from sklearn.decomposition import PCA
@@ -8,27 +9,29 @@ import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 
+#Helper functions
+metrics=['beta','forwardPE','marketCap','volume','targetMeanPrice','revenueGrowth']
+def data(stocks,metrics):
+    stockmetrics=[]
+    for i in range(len(stocks)):
+        lis = []
+        stock = yf.Ticker(stocks[i])
+        for k in range(len(metrics)):
+            lis.append(stock.info.get(metrics[k]))
+        stockmetrics.append(lis)
+    array=np.array(stockmetrics)
+    return array
+
 #TODO: Create a screener that generates a list of preliminary candidates-these will get k-NN
 
 #Set up the PCA:
 #Array with stocks that made good pitches
-winners=['MGNI','CYTK','CI', 'GOGO','FIVN']
+winners=['MGNI','CYTK','CI', 'GOGO','FIVN','ESTA']
 #Then generate a numpy matrix with row[i] containing all of the metrics for stock[i]
 #For instance, P/E, EV/EBITDA, etc.
-winnerattributes=[]
 #Important: How to deal with negative or nonexistent multiples? Cannot just have them in.
 #Otherwise k-NN falls apart since we need to do PCA and a distance on them
-for i in range(len(winners)):
-    lis=[]
-    stock=yf.Ticker(winners[i])
-    lis.append(stock.info.get('beta'))
-    lis.append(stock.info.get('forwardPE'))
-    lis.append(stock.info.get('marketCap'))
-    lis.append(stock.info.get('volume'))
-    lis.append(stock.info.get('targetMeanPrice'))
-    lis.append(stock.info.get('revenueGrowth'))
-    winnerattributes.append(lis)
-
+winnerattributes=data(winners,metrics)
 print(winnerattributes)
 
 stockmatrix=np.array(winnerattributes)
@@ -57,20 +60,8 @@ ax.scatter3D(pcasm[:,0], pcasm[:,1], pcasm[:,2])
 
 #Initialize an array of candidates
 candidates=['XYZ','PI','MS','MTCH','TMDX','TXRH']
-candidateattributes=[]
 #Collect the same data
-for i in range(len(candidates)):
-    lis=[]
-    stock=yf.Ticker(candidates[i])
-    lis.append(stock.info.get('beta'))
-    lis.append(stock.info.get('forwardPE'))
-    lis.append(stock.info.get('marketCap'))
-    lis.append(stock.info.get('volume'))
-    lis.append(stock.info.get('targetMeanPrice'))
-    lis.append(stock.info.get('revenueGrowth'))
-    candidateattributes.append(lis)
-candidatematrix=np.array(candidateattributes)
-print(candidatematrix)
+candidatematrix=data(candidates,metrics)
 #Now standardize:
 scalar.fit(candidatematrix)
 scalar.transform(candidatematrix)
