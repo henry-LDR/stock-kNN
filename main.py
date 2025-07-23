@@ -29,7 +29,6 @@ def data(stocks,metrics):
     return array
 
 #TODO: Create a screener that generates a list of preliminary candidates-these will get k-NN
-
 #Set up the PCA:
 #Then generate a numpy matrix with row[i] containing all of the metrics for stock[i]
 #For instance, P/E, EV/EBITDA, etc.
